@@ -1,2 +1,2 @@
-# scraping_by_LM_RL
+# scraping_by_LM
 A push button language model-based function that scrapes web-data into csv files. 
