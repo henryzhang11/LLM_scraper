@@ -1,0 +1,5 @@
+requests
+lxml
+bs4
+urllib
+re
