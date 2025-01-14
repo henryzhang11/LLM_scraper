@@ -1,2 +1,2 @@
-# scraping_with_LM
-A push button language model-based spider.
+# LLM_scraper
+A push button language model-based web-scraper.
