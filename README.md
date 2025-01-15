@@ -1,2 +1,2 @@
 # LLM_scraper
-A push button language model-based web-scraper.
+A language model-based web-scraping function.
