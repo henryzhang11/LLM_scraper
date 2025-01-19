@@ -3,7 +3,7 @@ from subprocess import CompletedProcess
 from typing import Callable
 import re
 import os
-import ggml_model
+import quantized_model
 
 class Scraper:
 	def __init__(self, language_model_function : Callable[[str], str]) -> None:
@@ -119,10 +119,18 @@ class Scraper:
 			)
 			format_revision_attempt += 1
 		if match:
+			print(
+				"Found code snippet in language model response text" + 
+				f"at attempt {format_revision_attempt}"
+			)
+			print(
+				"Trying to run the following code:" +
+				match.group(1)
+			)
 			return match.group(1)
 		else:
 			raise ValueError("Couldn't generate code block.")
 
 if __name__ == "__main__":
-	model = Scraper(ggml_model.language_model)
+	model = Scraper(quantized_model.language_model)
 	model.generate_working_code()
