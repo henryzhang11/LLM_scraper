@@ -6,51 +6,43 @@ import os
 import ggml_model
 
 class Scraper:
-	def __init__(self) -> None:
+	def __init__(self, language_model_function : Callable[[str], str]) -> None:
+		self.language_model = language_model_function
 		# "" for steps within a self-debugging session
 		self.user_inputs = []
 		# Attempts for the script
 		self.language_model_output = []
 		self.stdouts = []
 		self.stderrs = []
-		# Prompt user for input
-		user_input = input("Please enter scraping job:")
-		self.user_inputs.append(user_input)
-		self.openai_API_key = input("Please enter OpenAI API key:")
 
 	# Generate scripts until all requirements from user are met
-	def generate_working_code(
-			self,
-			language_model : Callable[[str], str]
-	):
-		self.generate_error_free_code(language_model)
-		critique = input("Please enter scraping problem:")
+	def generate_working_code(self):
+		# Prompt user for input
+		user_input = input("Please enter scraping job:")
+		self.user_inputs.append(user_input.strip())
+		self.generate_error_free_code()
+		critique = input("Please enter issue(s) with scraping job:")
 		while critique:
-			self.user_inputs.append(critique)
-			self.generate_error_free_code(language_model)
-	
-	# Generate scripts until one runs without error
-	def generate_error_free_code(
-		self, 
-		language_model : Callable[[str], str], 
-		maximum_refinement_attempts=20
-		) -> None:
-		input_string = self.user_inputs[0] + " Please surround code by ```."
-		code = self.generate_code(
-			input_string, 
-			language_model, 
-			maximum_refinement_attempts
-		)
-		self.language_model_output.append(code)
-		self.user_inputs.append("")
-		result = self.test_run(code)
-		self.stdouts.append(result.stdout)
-		self.stderrs.append(result.stderr)
-		script_revision_attempt = 0
-		while (
-			result.returncode != 0 and 
-			script_revision_attempt < maximum_refinement_attempts):
-			input_string = (
+			self.user_inputs.append(critique.strip())
+			self.generate_error_free_code()
+
+	def format_input_string(self, syntax_revision : bool) -> str:
+		if len(self.user_inputs) == 1:
+			
+		if syntax_revision == False:
+			return (
+				"Please revise a Python script written for the following job: " + 
+				self.user_inputs[0] + 
+				" Here is the script: ```" +
+				self.language_model_output[-1] + 
+				"```. Here is its standard output: ```" +
+				self.stdouts[-1] + 
+				"```. Please make the following revision: " + 
+				self.user_inputs[-1] +
+				" Please surround code by ```."
+			)
+		else:
+			return (
 				"Please fix the following error: \"" + 
 				self.stderrs[-1][:1000] + 
 				"\" which results from executing the code: \"" + 
@@ -59,11 +51,22 @@ class Scraper:
 				self.user_inputs[0] + 
 				" Please surround code by ```."
 			)
-			code = self.generate_code(
-				input_string, 
-				language_model, 
-				maximum_refinement_attempts
-			) # TODO: include stdout and limit stdout/stderr output to first 1000 characters
+
+	# Generate scripts until one runs without error
+	def generate_error_free_code(self, maximum_refinement_attempts=20) -> None:
+		input_string = self.format_input_string(True)
+		code = self.generate_code(input_string, maximum_refinement_attempts)
+		self.language_model_output.append(code)
+		result = self.test_run(code)
+		self.stdouts.append(result.stdout)
+		self.stderrs.append(result.stderr)
+		script_revision_attempt = 0
+		while (
+			result.returncode != 0 and 
+			script_revision_attempt < maximum_refinement_attempts
+			):
+			input_string = self.format_input_string(False)
+			code = self.generate_code(input_string, maximum_refinement_attempts) # TODO: include stdout and limit stdout/stderr output to first 1000 characters
 			self.language_model_output.append(code)
 			self.user_inputs.append("")
 			result = self.test_run(code)
@@ -91,13 +94,8 @@ class Scraper:
 			os.remove('script_attempt.py')
 
 	# Generate responses until one contains a code block
-	def generate_code(
-			self, 
-			input, 
-			language_model : Callable[[str], str], 
-			maximum_refinement_attempts=20
-		) -> str:
-		language_model_response = language_model(input)
+	def generate_code(self, input, maximum_refinement_attempts=20) -> str:
+		language_model_response = self.language_model(input)
 		match = re.search(
 			r"```(?:python)?\n(.*?)\n```", 
 			language_model_response, 
@@ -105,7 +103,7 @@ class Scraper:
 		)
 		format_revision_attempt = 0
 		while not match and format_revision_attempt < maximum_refinement_attempts:
-			language_model_response = language_model(input)
+			language_model_response = self.language_model(input)
 			match = re.search(
 				r"```(?:python)?\n(.*?)\n```", 
 				language_model_response, 
@@ -118,5 +116,5 @@ class Scraper:
 			raise ValueError("Couldn't generate code block.")
 
 if __name__ == "__main__":
-	model = Scraper()
-	model.generate_error_free_code(ggml_model.language_model)
+	model = Scraper(ggml_model.language_model)
+	model.generate_working_code()
