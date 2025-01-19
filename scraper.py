@@ -26,35 +26,43 @@ class Scraper:
 			self.user_inputs.append(critique.strip())
 			self.generate_error_free_code()
 
-	def format_input_string(self, syntax_revision : bool) -> str:
+	def format_input_string(self) -> str:
 		if len(self.user_inputs) == 1:
-			
-		if syntax_revision == False:
 			return (
-				"Please revise a Python script written for the following job: " + 
+				"Please write a Python script written for the following job: " + 
 				self.user_inputs[0] + 
+				" Please surround code by ```."
+			)
+		# Check if this is not a syntax revision, which has "" as user_inputs
+		if self.user_inputs[-1] != "": 
+			return (
+				"Please revise a Python script written to do: " + 
+				self.user_inputs[0] + 
+				"```. Please make the following revision: " + 
+				self.user_inputs[-1] +
 				" Here is the script: ```" +
 				self.language_model_output[-1] + 
 				"```. Here is its standard output: ```" +
-				self.stdouts[-1] + 
-				"```. Please make the following revision: " + 
-				self.user_inputs[-1] +
+				self.stdouts[-1] +
 				" Please surround code by ```."
 			)
+		# If this is a syntax revision
 		else:
 			return (
-				"Please fix the following error: \"" + 
-				self.stderrs[-1][:1000] + 
-				"\" which results from executing the code: \"" + 
-				self.language_model_output[-1] + 
-				"\" for the task " + 
+				"Please fix an error of a Python script written to do this: " + 
 				self.user_inputs[0] + 
-				" Please surround code by ```."
+				" Here is the script: ```" +
+				self.language_model_output[-1] + 
+				"```. Here is its standard error: ```" +
+				self.stderrs[-1] + 
+				"```. Here is its standard output: ```" + 
+				self.stdouts[-1] + 
+				"```. Please surround code by ```."
 			)
 
 	# Generate scripts until one runs without error
 	def generate_error_free_code(self, maximum_refinement_attempts=20) -> None:
-		input_string = self.format_input_string(True)
+		input_string = self.format_input_string()
 		code = self.generate_code(input_string, maximum_refinement_attempts)
 		self.language_model_output.append(code)
 		result = self.test_run(code)
@@ -65,10 +73,10 @@ class Scraper:
 			result.returncode != 0 and 
 			script_revision_attempt < maximum_refinement_attempts
 			):
-			input_string = self.format_input_string(False)
+			self.user_inputs.append("")
+			input_string = self.format_input_string()
 			code = self.generate_code(input_string, maximum_refinement_attempts) # TODO: include stdout and limit stdout/stderr output to first 1000 characters
 			self.language_model_output.append(code)
-			self.user_inputs.append("")
 			result = self.test_run(code)
 			self.stdouts.append(result.stdout)
 			self.stderrs.append(result.stderr)
