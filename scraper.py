@@ -121,7 +121,7 @@ class Scraper:
 		if match:
 			print(
 				"Found code snippet in language model response text" + 
-				f"at attempt {format_revision_attempt}"
+				f" at attempt {format_revision_attempt}"
 			)
 			print(
 				"Trying to run the following code:" +
