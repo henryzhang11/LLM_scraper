@@ -19,8 +19,7 @@ class LanguageModel:
 				filename="gemma-2-9b-it-IQ2_M.gguf",
 				n_ctx=1024,
 				n_threads=2,
-				seed=42,
-				logits_all=True
+				seed=42
 			)
 
 	def language_model(self, prompt: str) -> str:
