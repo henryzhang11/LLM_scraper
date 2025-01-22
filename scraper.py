@@ -132,5 +132,6 @@ class Scraper:
 			raise ValueError("Couldn't generate code block.")
 
 if __name__ == "__main__":
-	model = Scraper(quantized_model.language_model)
-	model.generate_working_code()
+	model = quantized_model.LanguageModel()
+	scraper = Scraper(model.language_model)
+	scraper.generate_working_code()
