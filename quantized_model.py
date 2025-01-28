@@ -9,7 +9,7 @@ class LanguageModel:
 				repo_id="bartowski/gemma-2-9b-it-GGUF",
 				filename="gemma-2-9b-it-IQ2_M.gguf",
 				n_ctx = 1024, 
-				n_threads=2, 
+				n_threads=8, 
 				seed=42,
 				logits_all=True 
 			)
@@ -18,7 +18,7 @@ class LanguageModel:
 				repo_id="bartowski/gemma-2-9b-it-GGUF",
 				filename="gemma-2-9b-it-IQ2_M.gguf",
 				n_ctx=1024,
-				n_threads=2,
+				n_threads=8,
 				seed=42
 			)
 

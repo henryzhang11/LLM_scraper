@@ -90,14 +90,11 @@ class Scraper:
 		script_filename = 'script_attempt.py'
 		with open(script_filename, 'w') as file:
 			file.write(code)
-		try:
-			return subprocess.run(
-				["python3", "script_attempt.py"],
-				capture_output=True,
-				text=True,
-				timeout=30)
-		finally:
-			return
+		return subprocess.run(
+			["python3", "script_attempt.py"],
+			capture_output=True,
+			text=True,
+			timeout=30)
 
 	# Generate responses until one contains a code block
 	def generate_code(self, input, maximum_refinement_attempts=20) -> str:
