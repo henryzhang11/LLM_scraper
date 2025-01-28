@@ -75,7 +75,7 @@ class Scraper:
 			):
 			self.user_inputs.append("")
 			input_string = self.format_input_string()
-			code = self.generate_code(input_string, maximum_refinement_attempts) # TODO: include stdout and limit stdout/stderr output to first 1000 characters
+			code = self.generate_code(input_string, maximum_refinement_attempts)
 			self.language_model_output.append(code)
 			result = self.test_run(code)
 			self.stdouts.append(result.stdout)
@@ -85,21 +85,19 @@ class Scraper:
 			raise ValueError("Couldn't generate error free code.")
 
 	# Try running code
+	# TODO: Run code in container instead of directly
 	def test_run(self, code : str) -> CompletedProcess: 
 		script_filename = 'script_attempt.py'
 		with open(script_filename, 'w') as file:
 			file.write(code)
 		try:
 			return subprocess.run(
-				[
-					'docker', 'run', '--rm', '-v', f"{os.getcwd()}:/app", 'python:3.9', 
-		 			'python', f"/app/{script_filename}"
-				],
+				["python3", "script_attempt.py"],
 				capture_output=True,
 				text=True,
 				timeout=30)
 		finally:
-			os.remove('script_attempt.py')
+			return
 
 	# Generate responses until one contains a code block
 	def generate_code(self, input, maximum_refinement_attempts=20) -> str:
