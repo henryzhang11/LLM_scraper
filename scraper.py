@@ -1,88 +1,92 @@
 import subprocess
 from subprocess import CompletedProcess
-from typing import Callable
+from typing import Callable, Tuple
 import re
-import os
-import quantized_model
 
 class Scraper:
-	def __init__(self, language_model_function : Callable[[str], str]) -> None:
+	def __init__(
+		self,
+		language_model_function: Callable[[str], str],
+		user_input: str
+	) -> None:
+		self.job_description = user_input
 		self.language_model = language_model_function
-		# "" for steps within a self-debugging session
-		self.user_inputs = []
-		# Attempts for the script
-		self.language_model_output = []
+		self.script = ""
 		self.stdouts = []
 		self.stderrs = []
+		
+	@classmethod
+	def generate_and_revise(cls, language_model_function: Callable[[str], str], user_input: str) -> str:
+		"""
+		Class method that instantiates Scraper and calls its instance method.I
+		"""
+		instance = cls(language_model_function, user_input)
+		return instance.generate_and_revise_instance()
 
-	# Generate scripts until all requirements from user are met
-	def generate_working_code(self):
-		# Prompt user for input
-		user_input = input("Please enter scraping job:")
-		self.user_inputs.append(user_input.strip())
-		self.generate_error_free_code()
-		critique = input("Please enter issue(s) with scraping job:")
-		while critique:
-			self.user_inputs.append(critique.strip())
-			self.generate_error_free_code()
+	def generate_and_revise_instance(self) -> str:
+		"""
+		Class method that generate scripts until no longer needing revision
+		"""
+		self.generate_script()
+		need_revision  = self.critique()
+		while need_revision:
+			self.generate_script()
+			need_revision = self.critique()
+		return self.script
+
+	def critique(self) -> Tuple[bool, str]:
+		# TODO: give language model job, code, stdout, and stderr and 
+		input_string = (
+			"Please judge whether ```" + 
+			self.script + 
+			"```, which when executed gives the standard output: ```" +
+			self.stdout + 
+			"''', and the standard error: ```" + 
+			self.stderr +
+			"```, accomplished the following job: '" + 
+			self.job_description +
+			"'. Please briefly analyze the script and output 'Yes' or 'No' at the end of your response."
+		)
+		language_model_output = self.language_model(input_string)
+		match = re.search(r'\b(Yes|No)\b$', language_model_output)
+		result = match.group(0) if match else None
+		if match is None:
+			language_model_output = self.language_model(input_string)
+			match = re.search(r'\b(Yes|No)\b$', language_model_output)
+			result = match.group(0) if match else None
+		if result == 'No':
+			return False
+		return True	
 
 	def format_input_string(self) -> str:
-		if len(self.user_inputs) == 1:
+		if self.script == "":
 			return (
-				"Please write a Python script written for the following job: " + 
-				self.user_inputs[0] + 
+				"Please write a Python script for the following job: " + 
+				self.job_description + 
 				" Please surround code by ```."
 			)
-		# Check if this is not a syntax revision, which has "" as user_inputs
-		if self.user_inputs[-1] != "": 
+		# Otherwise, revise the script
+		else: 
 			return (
-				"Please revise a Python script written to do: " + 
-				self.user_inputs[0] + 
-				"```. Please make the following revision: " + 
-				self.user_inputs[-1] +
-				" Here is the script: ```" +
-				self.language_model_output[-1] + 
+				"Please work on a Python script for the following job: " + 
+				self.job_description + 
+				" Here is the current script: ```" +
+				self.script + 
 				"```. Here is its standard output: ```" +
-				self.stdouts[-1] +
+				self.stdout +
+				"```. Here is its standard error: ```" + 
+				self.stderr +
 				" Please surround code by ```."
-			)
-		# If this is a syntax revision
-		else:
-			return (
-				"Please fix an error of a Python script written to do this: " + 
-				self.user_inputs[0] + 
-				" Here is the script: ```" +
-				self.language_model_output[-1] + 
-				"```. Here is its standard error: ```" +
-				self.stderrs[-1] + 
-				"```. Here is its standard output: ```" + 
-				self.stdouts[-1] + 
-				"```. Please surround code by ```."
 			)
 
 	# Generate scripts until one runs without error
-	def generate_error_free_code(self, maximum_refinement_attempts=20) -> None:
+	def generate_script(self) -> None:
 		input_string = self.format_input_string()
-		code = self.generate_code(input_string, maximum_refinement_attempts)
-		self.language_model_output.append(code)
+		code = self.generate_code(input_string)
+		self.script.append(code)
 		result = self.test_run(code)
 		self.stdouts.append(result.stdout)
 		self.stderrs.append(result.stderr)
-		script_revision_attempt = 0
-		while (
-			result.returncode != 0 and 
-			script_revision_attempt < maximum_refinement_attempts
-			):
-			self.user_inputs.append("")
-			input_string = self.format_input_string()
-			code = self.generate_code(input_string, maximum_refinement_attempts)
-			self.language_model_output.append(code)
-			result = self.test_run(code)
-			self.stdouts.append(result.stdout)
-			self.stderrs.append(result.stderr)
-			script_revision_attempt += 1
-		if result.returncode != 0:
-			raise ValueError("Couldn't generate error free code.")
 
 	# Try running code
 	# TODO: Run code in container instead of directly
@@ -125,8 +129,3 @@ class Scraper:
 			return match.group(1)
 		else:
 			raise ValueError("Couldn't generate code block.")
-
-if __name__ == "__main__":
-	model = quantized_model.LanguageModel()
-	scraper = Scraper(model.language_model)
-	scraper.generate_working_code()
