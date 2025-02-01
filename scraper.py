@@ -4,6 +4,7 @@ from typing import Callable, Tuple
 import re
 
 class Scraper:
+
 	def __init__(
 		self,
 		language_model_function: Callable[[str], str],
@@ -15,12 +16,16 @@ class Scraper:
 		self.history = []
 		
 	@classmethod
-	def generate(cls, language_model_function: Callable[[str], str], user_input: str, one_pass=True) -> str:
+	def generate(
+		cls, 
+		language_model_function: Callable[[str], str], 
+		user_input: str
+	) -> str:
 		"""
 		Class method that instantiates Scraper and calls its instance method.I
 		"""			
 		instance = cls(language_model_function, user_input)
-		return instance.generate_and_revise_instance()
+		return instance.generate_instance()
 
 	def generate_instance(self) -> str:
 		"""
@@ -33,18 +38,18 @@ class Scraper:
 			self.generate_and_run_script()
 			need_revision = self.critique()
 			print("Finished an iteration.")
-		return self.script
+		return self.history[-1]['script']
 
-	def critique(self) -> Tuple[bool, str]:
+	def critique(self) -> bool:
 		# If the code produces errors, revise it.
-		if self.history[-1][2] != "":
-			return False
+		if self.history[-1]['stderr'] != "":
+			return True
 		# If the code doesn't do what the prompt asks, revise it.
 		input_string = (
 			"Please judge whether ```" + 
-			self.history[-1][0] + 
+			self.history[-1]['script'] + 
 			"```, which when executed gives the standard output: ```" +
-			self.stdout[-1][1] + 
+			self.history[-1]['stdout'] + 
 			"```, accomplished the following job: '" + 
 			self.job_description +
 			"'. Please analyze and output 'Yes' or 'No' in the end."
@@ -58,23 +63,23 @@ class Scraper:
 			language_model_output = self.language_model(input_string)
 			match = re.search(r'\b(Yes|No)\b$', language_model_output)
 			result = match.group(0) if match else None
-		if result == 'No':
+		if result == 'Yes':
 			return False
 		return True	
 
 	def format_input_string(self) -> str:
 		if self.history == []:
 			return (
-				"Please write a Python script for the following job: " + 
+				"Please write a Python script for the following job: \"" + 
 				self.job_description + 
-				" Please surround code by ```."
+				"\". Please surround code by ```."
 			)
 		# Otherwise, revise the script
 		else: 
 			return (
-				"Please work on a Python script for the following job: " + 
+				"Please work on a Python script for the following job: \"" + 
 				self.job_description + 
-				" Here is history of past scripts, stdouts, and stderrs: " +
+				"\". Here is history of past scripts, stdouts, and stderrs: " +
 				str(self.history) +
 				" Please surround code by ```."
 			)
@@ -94,9 +99,9 @@ class Scraper:
 		print("Current iteration gives " + str(current_step) + '.\n')
 
 	# Generate responses until one contains a code block.
-	def generate_script(self, input, maximum_refinement_attempts=20) -> str:
+	def generate_script(self, model_input, maximum_refinement_attempts=20) -> str:
 		print("Generating language model response.")
-		language_model_response = self.language_model(input)
+		language_model_response = self.language_model(model_input)
 		match = re.search(
 			r"```(?:python)?\n(.*?)\n```", 
 			language_model_response, 
@@ -108,7 +113,7 @@ class Scraper:
 			and format_revision_attempt < maximum_refinement_attempts
 		):
 			print("Generating new language model response.")
-			language_model_response = self.language_model(input)
+			language_model_response = self.language_model(model_input)
 			match = re.search(
 				r"```(?:python)?\n(.*?)\n```", 
 				language_model_response, 
