@@ -1,4 +1,3 @@
-```markdown
 # Scraper & Quantized Model Repository
 
 Welcome to the **Scraper & Quantized Model** repository! This project integrates a Python-based web scraping automation tool (`scraper.py`) with a **quantized language model** (`quantized_model.py`) for efficient script generation and evaluation.
@@ -97,4 +96,3 @@ print(response)
 This project is licensed under the **MIT License**.
 
 *Happy scraping & model training!*
-```
