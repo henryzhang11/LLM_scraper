@@ -5,7 +5,7 @@ Welcome to the **Scraper & Quantized Model** repository! This project integrates
 ## Features
 
 - **Automated Script Generation & Execution** 
-  The `Scraper` class iteratively generates and refines Python scripts using a language model.
+  The `Scraper` class iteratively refines Python scripts using a language model.
   
 - **Quantized Language Model** 
   Uses `Llama` with a pre-trained **Gemma-2-9B-IT** model to generate scripts and provide critiques.
