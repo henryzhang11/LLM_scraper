@@ -19,7 +19,7 @@ Welcome to the **Scraper & Quantized Model** repository! This project integrates
 
 ### 1️⃣ Clone the Repository  
 ```bash
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/henryzhang11/LLM_scraper/
 cd your-repo
 ```
 
@@ -33,8 +33,6 @@ source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
-*(Make sure `llama-cpp-python` is installed for the quantized model.)*
-
 ---
 
 ## Usage
