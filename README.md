@@ -17,19 +17,19 @@ Welcome to the **Scraper & Quantized Model** repository! This project integrates
 
 ## Installation
 
-### 1 Clone the Repository  
+### 1. Clone the Repository  
 ```bash
 git clone https://github.com/henryzhang11/LLM_scraper/
 cd your-repo
 ```
 
-### 2 Create a Virtual Environment  
+### 2. Create a Virtual Environment  
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```
 
-### 3 Install Dependencies  
+### 3. Install Dependencies  
 ```bash
 pip install -r requirements.txt
 ```
