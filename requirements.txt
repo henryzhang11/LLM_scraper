@@ -1,3 +1,2 @@
 rich
-llama_cpp
-
+llama-cpp-python
