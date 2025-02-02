@@ -1,22 +1,22 @@
 ```markdown
-# 🕵️‍♂️ Scraper & Quantized Model Repository
+# Scraper & Quantized Model Repository
 
 Welcome to the **Scraper & Quantized Model** repository! This project integrates a Python-based web scraping automation tool (`scraper.py`) with a **quantized language model** (`quantized_model.py`) for efficient script generation and evaluation.
 
-## 📌 Features
+## Features
 
-- **Automated Script Generation & Execution** 🛠️  
+- **Automated Script Generation & Execution** 
   The `Scraper` class iteratively generates and refines Python scripts using a language model.
   
-- **Quantized Language Model** 🧠  
+- **Quantized Language Model** 
   Uses `Llama` with a pre-trained **Gemma-2-9B-IT** model to generate scripts and provide critiques.
 
-- **Error Handling & Iterative Refinement** 🔄  
+- **Error Handling & Iterative Refinement** 
   Scripts are evaluated for correctness and revised until they meet the job description.
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1️⃣ Clone the Repository  
 ```bash
@@ -38,9 +38,9 @@ pip install -r requirements.txt
 
 ---
 
-## 🛠️ Usage
+## Usage
 
-### 🕵️ Running the Scraper
+### Running the Scraper
 ```python
 from scraper import Scraper
 from quantized_model import QuantizedModel
@@ -58,7 +58,7 @@ script = Scraper.generate(model.language_model, job_description)
 print("Generated Script:\n", script)
 ```
 
-### 🧠 Using the Quantized Model Directly
+### Using the Quantized Model Directly
 ```python
 from quantized_model import QuantizedModel
 
@@ -72,7 +72,7 @@ print(response)
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 📂 your-repo/
@@ -84,17 +84,17 @@ print(response)
 
 ---
 
-## ⚡ To-Do / Future Improvements
+## To-Do / Future Improvements
 
-- ✅ Implement a **sandboxed execution environment** for scripts.
-- ✅ Improve **error handling & debugging**.
-- ⏳ Add **support for more Llama models**.
+- Implement a **sandboxed execution environment** for scripts.
+- Improve **error handling & debugging**.
+- Add **support for more Llama models**.
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the **MIT License**.
 
-🚀 *Happy scraping & model training!*
+*Happy scraping & model training!*
 ```
