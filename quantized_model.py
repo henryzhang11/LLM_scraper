@@ -3,7 +3,12 @@ from rich import print
 
 class QuantizedModel:
 	
-	def __init__(self, logprobs=False, threads=2):
+	def __init__(self, local=False, logprobs=False, threads=2):
+		"""
+		Loads a language model.
+		Args:
+			local (bool): Whether to load model from disk.
+		"""
 		self.log_probs=logprobs
 		if logprobs == True:
 			self.model = Llama.from_pretrained(
