@@ -6,7 +6,7 @@ def dummy_language_model(prompt: str) -> str:
         "Please write a Python script" in prompt or
         "Please work on a Python script" in prompt
     ):
-        return "```print('Hello World')```"
+        return "```\nprint('Hello World')\n```"
     if "Please judge whether" in prompt:
         return "The script meets the requirements. Yes"
     return ""
@@ -48,10 +48,10 @@ class TestScraper(unittest.TestCase):
     def test_run_script(self):
         scraper = Scraper(dummy_language_model, "Print 'Hello World'")
         input = "print(\"Hello World!\")"
-        result = scraper.test_run(input)
-        self.assertEqual(result.stdout, "Hello World!")
+        result = scraper.run_script(input)
+        self.assertEqual(result.stdout, "Hello World!\n")
         input = "number = 3\nprint(number[0])"
-        result = scraper.test_run(input)
+        result = scraper.run_script(input)
         self.assertNotEqual(result.stderr, "")
 
 if __name__ == '__main__':

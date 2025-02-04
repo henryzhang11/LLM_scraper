@@ -14,7 +14,7 @@ class QuantizedModel:
 			self.model = Llama.from_pretrained(
 				repo_id="bartowski/gemma-2-9b-it-GGUF",
 				filename="gemma-2-9b-it-IQ2_M.gguf",
-				n_ctx = 1024, 
+				n_ctx = 8192, 
 				n_threads=threads, 
 				seed=42,
 				logits_all=True,
@@ -24,7 +24,7 @@ class QuantizedModel:
 			self.model = Llama.from_pretrained(
 				repo_id="bartowski/gemma-2-9b-it-GGUF",
 				filename="gemma-2-9b-it-IQ2_M.gguf",
-				n_ctx=1024,
+				n_ctx=8192,
 				n_threads=threads,
 				seed=42,
 				verbose=False
@@ -44,16 +44,16 @@ class QuantizedModel:
 			text = None
 		return text
 	
-	def color_with_log_probs(top_logprobs):
+	def color_with_log_probs(self, top_logprobs):
 		"""
 		Print colored string based on 'top_logprobs'.
 		"""
 		result = ""
 		for top_logprob in top_logprobs:
-			result += color_with_log_prob(top_logprob)
+			result += self.color_with_log_prob(top_logprob)
 		print(result)
 
-	def color_with_log_prob(top_logprob):
+	def color_with_log_prob(self, top_logprob):
 		"""
 		Calculate the color of a single token.
 		"""

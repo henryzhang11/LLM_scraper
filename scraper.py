@@ -2,6 +2,7 @@ import subprocess
 from subprocess import CompletedProcess
 from typing import Callable, Tuple
 import re
+import quantized_model
 
 class Scraper:
 
@@ -141,3 +142,8 @@ class Scraper:
 			capture_output=True,
 			text=True,
 			timeout=30)
+
+if __name__ == '__main__':	
+	quantized_model = quantized_model.QuantizedModel()
+	job = input("Enter job: ")
+	scraper = Scraper.generate(quantized_model.language_model, job)

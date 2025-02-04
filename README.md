@@ -84,8 +84,7 @@ print(response)
 ## To-Do / Future Improvements
 
 - Implement a **sandboxed execution environment** for scripts.
-- Improve **error handling & debugging**.
-- Add **support for more Llama models**.
+- Add **support for DeepSeek r1 API and DeepSeek model**.
 
 ---
 

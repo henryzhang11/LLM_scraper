@@ -2,7 +2,7 @@ import unittest
 from quantized_model import QuantizedModel
 import time
 
-def dummy_language_model(**kwargs):
+def dummy_language_model(prompt: str, **kwargs):
     return None
 
 class TestQuantizedModel(unittest.TestCase):
