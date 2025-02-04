@@ -83,7 +83,7 @@ print(response)
 
 ## To-Do / Future Improvements
 
-- Implement a **sandboxed execution environment** for scripts.
+- Implement sandbox based on a persistent Docker container for running scripts.
 - Add **support for DeepSeek r1 API and DeepSeek model**.
 
 ---
