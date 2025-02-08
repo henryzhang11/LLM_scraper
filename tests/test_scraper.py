@@ -1,5 +1,5 @@
 import unittest
-from scraper import Scraper
+from scraper.scraper import Scraper
 
 def dummy_language_model(prompt: str) -> str:
     if (

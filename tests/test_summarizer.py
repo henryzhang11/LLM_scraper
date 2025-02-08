@@ -1,5 +1,5 @@
 import unittest
-import summarizer
+import scraper.summarizer as summarizer
 import requests
 
 class TestSummarizer(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestSummarizer(unittest.TestCase):
 		'''
 		Test whether segments are short enough strings
 		'''
-		context_window = 8192 #TODO: Change context_window if necessary
+		context_window = 4096 #TODO: Change context_window if necessary
 		response = requests.get("https://en.wikipedia.org/robots.txt")
 		output = response.text
 		self.assertIsInstance(output, str)
@@ -26,7 +26,7 @@ class TestSummarizer(unittest.TestCase):
 
 	def test_summarize_segments(self):
 		'''
-		Test whether summarizations are short enough strings	
+		Test whether summarizations are short enough strings
 		'''
 		context_window = 8192 #TODO: Change context_window if necessary
 		response = requests.get("https://en.wikipedia.org/robots.txt")

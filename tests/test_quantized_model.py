@@ -1,5 +1,5 @@
 import unittest
-from quantized_model import QuantizedModel
+from scraper.quantized_model import QuantizedModel
 import time
 
 def dummy_language_model(prompt: str, **kwargs):

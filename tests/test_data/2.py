@@ -1,4 +1,3 @@
-#%%
 from lxml import html
 import requests
 response = requests.get('http://catalog.data.gov/dataset?q=&sort=metadata_created+desc')

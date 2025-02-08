@@ -46,7 +46,7 @@ from quantized_model import QuantizedModel
 model = QuantizedModel()
 
 # Define a job description
-job_description = "Extract all hyperlinks from a given webpage."
+job_description = "Extract all hyperlinks from ."
 
 # Generate a script dynamically
 script = Scraper.generate(model.language_model, job_description)
@@ -72,7 +72,7 @@ print(response)
 ## Project Structure
 
 ```
-📂 your-repo/
+LLM_scraper/
 │── scraper.py        # Main Scraper class with iterative script refinement
 │── quantized_model.py # Quantized Llama model with Gemma-2-9B-IT
 │── requirements.txt   # Python dependencies
@@ -81,15 +81,6 @@ print(response)
 
 ---
 
-## To-Do / Future Improvements
-
-- Implement sandbox based on a persistent Docker container for running scripts.
-- Add **support for DeepSeek r1 API and DeepSeek model**.
-
----
-
 ## License
 
 This project is licensed under the **MIT License**.
-
-*Happy scraping & model training!*

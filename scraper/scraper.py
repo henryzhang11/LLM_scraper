@@ -2,7 +2,7 @@ import subprocess
 from subprocess import CompletedProcess
 from typing import Callable, Tuple
 import re
-import quantized_model
+import scraper.quantized_model as quantized_model
 
 class Scraper:
 
@@ -23,14 +23,16 @@ class Scraper:
 		user_input: str
 	) -> str:
 		"""
-		Class method that instantiates Scraper and calls its instance method.I
+		Initialize Scraper and call its instance method.
+		Returns:
+			str: script for the scraping job
 		"""			
 		instance = cls(language_model_function, user_input)
 		return instance.generate_instance()
 
 	def generate_instance(self) -> str:
 		"""
-		Class method that generate scripts until no longer needing revision
+		Generate scripts until no longer needing revision
 		"""
 		self.generate_and_run_script()
 		need_revision  = self.critique()
@@ -42,6 +44,9 @@ class Scraper:
 		return self.history[-1]['script']
 
 	def critique(self) -> bool:
+		"""
+		Decide if the script needs revision
+		"""
 		# If the code produces errors, revise it.
 		if self.history[-1]['stderr'] != "":
 			return True
@@ -69,6 +74,9 @@ class Scraper:
 		return True	
 
 	def format_input_string(self) -> str:
+		"""
+		Generate input string 
+		"""
 		if self.history == []:
 			return (
 				"Please write a Python script for the following job: \"" + 
@@ -76,6 +84,7 @@ class Scraper:
 				"\". Please surround code by ```."
 			)
 		# Otherwise, revise the script
+		# TODO: Change the input string for revisions to account for summaries
 		else: 
 			return (
 				"Please work on a Python script for the following job: \"" + 
@@ -85,8 +94,10 @@ class Scraper:
 				" Please surround code by ```."
 			)
 
-	# Generate and run a script.
 	def generate_and_run_script(self) -> None:
+		"""
+		Generate and run a script.
+		"""
 		input_string = self.format_input_string()
 		code = self.generate_script(input_string)
 		print("Generating script.")
@@ -99,8 +110,10 @@ class Scraper:
 		self.history.append(current_step)
 		print("Current iteration gives " + str(current_step) + '.\n')
 
-	# Generate responses until one contains a code block.
 	def generate_script(self, model_input, maximum_refinement_attempts=20) -> str:
+		"""
+		Generate responses until one contains a code block.
+		"""
 		print("Generating language model response.")
 		language_model_response = self.language_model(model_input)
 		match = re.search(
@@ -131,9 +144,11 @@ class Scraper:
 		else:
 			raise ValueError("Couldn't generate code block.")
 
-	# Run generated code.
 	# TODO: Run code in container instead of directly
-	def run_script(self, code : str) -> CompletedProcess: 
+	def run_script(self, code : str) -> CompletedProcess:
+		"""
+		Run generated code.
+		"""
 		script_filename = 'script_attempt.py'
 		with open(script_filename, 'w') as file:
 			file.write(code)
