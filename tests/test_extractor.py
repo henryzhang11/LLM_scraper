@@ -1,5 +1,5 @@
 import unittest
-import scraper.summarizer as summarizer
+import scraper.extractor as extractor
 import requests
 
 class TestSummarizer(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestSummarizer(unittest.TestCase):
 		response = requests.get("https://en.wikipedia.org/robots.txt")
 		output = response.text
 		self.assertIsInstance(output, str)
-		segments = summarizer.segment_string(output, context_window)
+		segments = extractor.segment_string(output, context_window)
 		self.assertIsInstance(segments, list)
 		self.assertTrue(
 			all(isinstance(item, str) for item in segments), 
@@ -32,8 +32,8 @@ class TestSummarizer(unittest.TestCase):
 		response = requests.get("https://en.wikipedia.org/robots.txt")
 		output = response.text
 		self.assertIsInstance(output, str)
-		segments = summarizer.segment_string(output, context_window)
-		summaries = summarizer.summarize_segments(segments)
+		segments = extractor.segment_string(output, context_window)
+		summaries = extractor.summarize_segments(segments)
 		for i in range(len(summaries)):
 			self.assertIsInstance(summaries[i], str)
 			self.assertLessEqual(len(summaries[i]), 300)

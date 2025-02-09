@@ -1,7 +1,7 @@
 from llama_cpp import Llama
 from rich import print
 
-class QuantizedModel:
+class LanguageModel:
 	
 	def __init__(self, local=False, logprobs=False, threads=2):
 		"""
@@ -30,7 +30,7 @@ class QuantizedModel:
 				verbose=False
 			)
 
-	def language_model(self, prompt: str) -> str:
+	def generate_response(self, prompt: str) -> str:
 		if self.log_probs == True:
 			response = self.model(prompt, max_tokens=1024, logprobs=1, temperature=0.5, top_k=40)
 			logprobs = response['choices'][0]['logprobs']

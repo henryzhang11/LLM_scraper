@@ -1,11 +1,11 @@
 import unittest
-from scraper.quantized_model import QuantizedModel
+from scraper.language_model import QuantizedModel
 import time
 
 def dummy_language_model(prompt: str, **kwargs):
     return None
 
-class TestQuantizedModel(unittest.TestCase):
+class TestLanguageModel(unittest.TestCase):
 
     def test_language_model_logprobs_true(self):
         print("Test logprobs=True mode")

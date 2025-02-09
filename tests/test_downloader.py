@@ -1,7 +1,7 @@
 import unittest
-import scraper.download_file as download_file
+import scraper.downloader as downloader
 from typing import Callable, Tuple
-from scraper.quantized_model import QuantizedModel
+from scraper.language_model import QuantizedModel
 import os
 
 class TestDownloadFile(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestDownloadFile(unittest.TestCase):
         """
         model = QuantizedModel(logprobs=True)
 
-        script, file = download_file.download(
+        script, file = downloader.download(
             model.language_model, 
             user_request
         )

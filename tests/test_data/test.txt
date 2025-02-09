@@ -1,5 +1,5 @@
 Get the number of datasets currently listed on "https://data.gov".
-Display the name of the most recently added dataset on "http://catalog.data.gov/dataset?q=&sort=metadata_created+desc".
-Extract h1 tag from "example.com".
-Extract and save all the header tags from "en.wikipedia.org/wiki/Main_Page".
-Extract and save all the image links from "en.wikipedia.org/wiki/Peter_Jeffrey_(RAAF_officer)".
+Get the name of the most recently added dataset on "http://catalog.data.gov/dataset?q=&sort=metadata_created+desc".
+Get h1 tag from "example.com".
+Get the header tags from "en.wikipedia.org/wiki/Main_Page".
+Get all image links from "en.wikipedia.org/wiki/Peter_Jeffrey_(RAAF_officer)".
