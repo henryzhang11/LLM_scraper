@@ -66,3 +66,4 @@ class LanguageModel:
 				g = 160 + i * 20
 		color = f"#{0:02x}{g:02x}{0:02x}"
 		return f"[{color}]{token}[/{color}]"
+

@@ -1,16 +1,84 @@
+import os
+from typing import Tuple, Callable
+from error_free_coder import ErrorFreeCoder
 import utils
+import re
 
-class Downloader:
-    
-    def __init__(self):
-        return
+# TODO: Add code for page navigation.
+def download(
+    language_model: Callable[[str], str],
+    user_request: str,
+    context_window: int
+) -> Tuple[str, str]:
+    """Write a file that downloads the HTML until it succeeds
+    Returns:
+        tuple: A tuple containing:
+            download_script (str): A script for downloading the HTML file
+    """
+    print("Generating script for downloading HTML.")
+    # Compute a hash number to avoid conflict
+    hash_value = str(hash(user_request))[:4] 
+    file_path = "./temp" + hash_value
+    # Remove 'temp' file
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    download_request = (
+        "Please download the HTML file needed for the " +
+        "following request: \"" +
+        user_request + 
+        f'" to "{file_path}".'
+    )                 
+    error_free_coder = ErrorFreeCoder(language_model, download_request)
+    script = error_free_coder.generate_error_free_code()
+    attempts = 1
+    while (
+        (not os.path.exists(file_path) or 
+        judge_needs_revision(
+            file_path, 
+            user_request, 
+            language_model,
+            context_window
+        )) and attempts <= 5
+    ):
+        error_free_coder = ErrorFreeCoder(language_model, download_request)
+        script = error_free_coder.generate_error_free_code()
+        attempts += 1
+    return script, file_path
 
-    def download(self):
-        """
-        While step 2 returns True:
-                Give LLM user_request and ask it to write code that downloads the 
-                    HTML into a temp.html file. 
-                Give LLM (user_request, HTML_chunk[i]) and ask it to decide if any 
-                    stdout_chunk[i] contains relevant data.
-        Returns the 
-        """
+def judge_needs_revision(
+    file_path, 
+    user_request: str,
+    language_model: Callable[[str], str],
+    context_window: int
+) -> bool:
+    print("Generating critique for latest download_script attempt.")
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+    except Exception as e:
+        print(f"An error {e} occured reading {file_path}.")
+        return True
+    segments = utils.segment_string(content, context_window // 2)
+    contains_target = False
+    for i in range(len(segments)):
+        request = (
+            "Please answer the following question about a chunk of a " + 
+            "downloaded file by briefly analyzing and answering 'Yes' or 'No' " +
+            "at the end of your answer: Does the chunk contain information " + 
+            "relevant to this web-scraping request: \"" + 
+            user_request +
+            "\"? Here is the chunk: \"" + 
+            segments[i] + 
+            "\"."
+        )
+        language_model_output = language_model(request)
+        match = re.search(r'\b(Yes|No)\b', language_model_output, re.IGNORECASE)
+        result = match.group(0) if match else None
+        while match is None:
+            print("Generating new critique for latest download_script attempt.")
+            language_model_output = language_model(request)
+            match = re.search(r'\b(Yes|No)\b', language_model_output, re.IGNORECASE)
+            result = match.group(0) if match else None
+        if result == "Yes":
+            contains_target = True
+    return not contains_target

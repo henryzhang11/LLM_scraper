@@ -1,43 +1,31 @@
+import utils
+import re
 
-def summarize_segments(segments: List[str]) -> List[str]:
-    """
-    While any HTML chunk hints at a revision:
-        Give LLM (user_request, HTML_chunk[i], code) and ask it to summarize 
-            anything worth noting relevant to revision of the script and 
-            decide if anything has to be done.
-        Give LLM (user_request, stdout_chunk[i], code) and ask it to 
-            summarize anything worth noting relevant to revision of the 
-            script and plan what it should do (next_step).
-        Give LLM (user_request, stdout_chunk[i], next_step, code) and ask it
-            to revise the code.   
-    """
-    return
-
-def generate(self):
+def generate():
     utils.generate_and_run_script()
-    need_revision  = self.critique()
+    need_revision  = critique()
     print("Finished an iteration.")
     while need_revision:
         utils.generate_and_run_script()
-        need_revision = self.critique()
+        need_revision = critique()
         print("Finished an iteration.")
-    return self.history[-1]['script']
+    return history[-1]['script']
 
-def critique(self) -> bool:
+def critique() -> bool:
     """
     Decide if the script needs revision
     """
     # If the code produces errors, revise it.
-    if self.history[-1]['stderr'] != "":
+    if history[-1]['stderr'] != "":
         return True
     # If the code doesn't do what the prompt asks, revise it.
     input_string = (
         "Please judge whether ```" + 
-        self.history[-1]['script'] + 
+        history[-1]['script'] + 
         "```, which when executed gives the standard output: ```" +
-        self.history[-1]['stdout'] + 
+        history[-1]['stdout'] + 
         "```, accomplished the following job: '" + 
-        self.job_description +
+        job_description +
         "'. Please analyze and output 'Yes' or 'No' in the end."
     )
     print("Generating critique for latest attempt.")
@@ -52,22 +40,6 @@ def critique(self) -> bool:
     if result == 'Yes':
         return False
     return True	
-
-def generate_and_run_script(self) -> None:
-    """
-    Generate and run a script.
-    """
-    input_string = self.format_input_string()
-    code = utils.generate_script(input_string)
-    print("Generating script.")
-    current_step = {}
-    current_step['script'] = code
-    print("Running code.")
-    result = utils.run_script(code)
-    current_step['stdout'] = result.stdout
-    current_step['stderr'] = result.stderr
-    self.history.append(current_step)
-    print("Current iteration gives " + str(current_step) + '.\n')
 
 def format_input_string(self) -> str:
     """

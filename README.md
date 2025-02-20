@@ -46,7 +46,7 @@ from quantized_model import QuantizedModel
 model = QuantizedModel()
 
 # Define a job description
-job_description = "Extract all hyperlinks from ."
+job_description = "Extract all hyperlinks from 'https://data.gov'."
 
 # Generate a script dynamically
 script = Scraper.generate(model.language_model, job_description)
