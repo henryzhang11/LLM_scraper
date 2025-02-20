@@ -33,7 +33,7 @@ def download(
     attempts = 1
     while (
         (not os.path.exists(file_path) or 
-        judge_needs_revision(
+        contains_no_target(
             file_path, 
             user_request, 
             language_model,
@@ -45,7 +45,7 @@ def download(
         attempts += 1
     return script, file_path
 
-def judge_needs_revision(
+def contains_no_target(
     file_path, 
     user_request: str,
     language_model: Callable[[str], str],
@@ -61,24 +61,11 @@ def judge_needs_revision(
     segments = utils.segment_string(content, context_window // 2)
     contains_target = False
     for i in range(len(segments)):
-        request = (
-            "Please answer the following question about a chunk of a " + 
-            "downloaded file by briefly analyzing and answering 'Yes' or 'No' " +
-            "at the end of your answer: Does the chunk contain information " + 
-            "relevant to this web-scraping request: \"" + 
-            user_request +
-            "\"? Here is the chunk: \"" + 
-            segments[i] + 
-            "\"."
+        result = utils.contains_target(
+            language_model, 
+            segments[i], 
+            user_request
         )
-        language_model_output = language_model(request)
-        match = re.search(r'\b(Yes|No)\b', language_model_output, re.IGNORECASE)
-        result = match.group(0) if match else None
-        while match is None:
-            print("Generating new critique for latest download_script attempt.")
-            language_model_output = language_model(request)
-            match = re.search(r'\b(Yes|No)\b', language_model_output, re.IGNORECASE)
-            result = match.group(0) if match else None
         if result == "Yes":
             contains_target = True
     return not contains_target

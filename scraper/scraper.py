@@ -9,10 +9,12 @@ class Scraper:
 	def __init__(
 		self,
 		language_model_function: Callable[[str], str],
+		context_window_length: int,
 		user_input: str
 	) -> None:
 		self.job_description = user_input
 		self.language_model = language_model_function
+		self.context_window = context_window_length
 		# Each element in 'history' maps script, stdout, and stderr to strings
 		self.history = []
 		
@@ -20,6 +22,7 @@ class Scraper:
 	def generate(
 		cls, 
 		language_model_function: Callable[[str], str], 
+		context_window: int,
 		user_input: str
 	) -> str:
 		"""Initialize Scraper and call its instance method.
@@ -30,12 +33,7 @@ class Scraper:
 		instance = cls(language_model_function, context_window, user_input)
 		return instance.generate_instance()
 
-	def generate_instance(
-		self, 
-		language_model_function,
-		context_window,
-		user_input
-	) -> str:
+	def generate_instance(self) -> str:
 		"""Generate scripts until no longer needing revision.
 
 		First ask LLM to generate script to download HTML into specific file. 
@@ -43,13 +41,13 @@ class Scraper:
 		concatenate the former 2 scripts and return the script.
 		"""
 		download_script, file_location = downloader.download(
-			language_model, 
+			self.language_model, 
 			("Please download the HTML file for this web scraping job: " 
 				+ self.job_description
 			),
-			context_window
+			self.context_window
 		)
-		extract_script = extractor.extract(file_location)
+		extract_script = extractor.extract(file_location, self.job_description)
 		final_script = utils.concatenate_scripts(
 			download_script, 
 			extract_script

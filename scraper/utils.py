@@ -34,3 +34,32 @@ def concatenate_scripts(script_1, script_2) -> str:
         + "\n" + "def main():\n\tfunc_1()\n\tfunc_2()"
     )
     return final_script
+
+def contains_target(
+    language_model: Callable[[str], str],
+    segment: str, 
+    user_request: str
+) -> bool:
+    """Decides if current segment of HTML contains relevant information.
+    """
+    request = (
+        "Please answer the following question about a chunk of " + 
+        "downloaded file by briefly analyzing and answering 'Yes' or 'No' " + 
+        "at the end of your answer: Does the chunk contain information " + 
+        "relevant to this web-scraping request: \"" + 
+        user_request + 
+        "\"? Here is the chunk: \"" + 
+        segment + 
+        "\"."
+    )
+    language_model_output = language_model(request)
+    match = re.search(r'\b(Yes|No)\b', language_model_output)
+    result = match.group(0) if match else None
+    while match is None:
+        print(f"Deciding whether segment[{i}] contains relevant info.")
+        language_model_output = language_model(request)
+        match = re.search(r'\b(Yes|No)\b', language_model_output)
+        result = match.group(0) if match else None
+    if result == "Yes":
+        return True
+    return False
