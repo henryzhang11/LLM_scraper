@@ -1,6 +1,7 @@
 
 import re
-from typing import Callable, CompletedProcess
+from typing import Callable
+from subprocess import CompletedProcess
 import subprocess
 import utils
 
@@ -20,32 +21,34 @@ class ErrorFreeCoder:
         self.model = language_model
 
     def generate_error_free_code(self) -> str:
-        """Generate and revise code until getting no erros.
+        """Generate and revise code until getting no errors.
         """
-        self.generate_and_run_script(input)
+        self.generate_and_run_script(self.model, self.context)
         while self.stderr != "":
-            revision_input = (input + 
-                "Please do so by revising ```" + 
+            revision_input = (
+				"Please write a Python script to fulfill the following request: \"" +
+				self.context + 
+                "\" Please do so by revising ```" + 
                 self.script + 
                 "``` which gives the stdout ```" + 
                 self.stdout + 
                 "``` and standerr ```" + 
                 self.stderr
             )
-            self.generate_and_run_script(revision_input)
-        return self.current_step['script']
+            self.generate_and_run_script(self.model, revision_input)
+        return self.script
 
     def generate_and_run_script(self, language_model, input) -> None:
         """Generate and run a script.
         """
-        code = utils.generate_script(language_model, input)
+        code = self.generate_script(language_model, input)
         print("Generating script.")
         self.script = code
         print("Running code.")
-        result = utils.run_script(code)
+        result = self.run_script(code)
         self.stdout = result.stdout
         self.stderr = result.stderr
-        print("Current iteration gives " + str(self.current_step) + '.\n')
+        print("Current iteration gives " + code + '.\n')
 
     # TODO: Run code in container instead of directly
     def run_script(self, code : str) -> CompletedProcess:
@@ -70,7 +73,7 @@ class ErrorFreeCoder:
         """
         Generate responses until one contains a code block.
         """
-        print("Generating language model response.")
+        print(f"Generating language model response with prompt={model_input}")
         language_model_response = language_model(model_input)
         match = re.search(
             r"```(?:python)?\n(.*?)\n```", 

@@ -28,8 +28,8 @@ def download(
         user_request + 
         f'" to "{file_path}".'
     )                 
-    error_free_coder = ErrorFreeCoder(language_model, download_request)
-    script = error_free_coder.generate_error_free_code()
+    coder = ErrorFreeCoder(language_model, download_request)
+    script = coder.generate_error_free_code()
     attempts = 1
     while (
         (not os.path.exists(file_path) or 
@@ -40,8 +40,8 @@ def download(
             context_window
         )) and attempts <= 5
     ):
-        error_free_coder = ErrorFreeCoder(language_model, download_request)
-        script = error_free_coder.generate_error_free_code()
+        coder = ErrorFreeCoder(language_model, download_request)
+        script = coder.generate_error_free_code()
         attempts += 1
     return script, file_path
 

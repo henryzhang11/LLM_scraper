@@ -1,3 +1,5 @@
 rich
 llama-cpp-python
 requests
+lxml
+bs4

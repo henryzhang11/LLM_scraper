@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 
 def segment_string(string: str, context_window: int) -> List[str]:
     """

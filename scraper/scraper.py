@@ -59,6 +59,6 @@ class Scraper:
 		return final_script
 
 if __name__ == '__main__':	
-	model = language_model.QuantizedModel()
+	model = language_model.LanguageModel()
 	job = input("Enter job: ")
-	scraper = Scraper.generate(model.generate_response, job)
+	scraper = Scraper.generate(model.generate_response, 1024, job)
