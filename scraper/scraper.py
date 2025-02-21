@@ -47,7 +47,11 @@ class Scraper:
 			),
 			self.context_window
 		)
-		extract_script = extractor.extract(file_location, self.job_description)
+		extract_script = extractor.extract(
+			file_location, 
+			self.job_description,
+			self.context_window
+		)
 		final_script = utils.concatenate_scripts(
 			download_script, 
 			extract_script
