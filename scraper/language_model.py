@@ -37,7 +37,7 @@ class LanguageModel:
 			top_logprobs = logprobs['top_logprobs'] # Top 1 token log probability
 			self.color_with_log_probs(top_logprobs)			
 		else:
-			print(f"Generating response for prompt={prompt}")
+			print(f"Language model generating response to prompt=\"{prompt}\".")
 			response = self.model(prompt, max_tokens=1024, temperature=0.5, top_k=40)
 		try:
 			text = response['choices'][0]['text']

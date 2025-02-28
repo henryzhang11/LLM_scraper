@@ -17,7 +17,7 @@ def extract(
     segments = utils.segment_string(content, context_window // 2)
     script = ""
     for i in range(len(segments)):
-        if not utils.contains_target(language_model, segment, job_description):
+        if not utils.contains_target(language_model, segments[i], job_description):
             continue
         revision_request = (
             "Please revise a script that extracts information from the " +
@@ -25,7 +25,7 @@ def extract(
             job_description + 
             f'". Here is the script: "' + 
             script + 
-            "\" and here is the HTML segment: \"" + 
+            "\". Here is the HTML segment: \"" + 
             segments[i] + 
             "\"."
         )

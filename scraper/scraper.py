@@ -42,12 +42,11 @@ class Scraper:
 		"""
 		download_script, file_location = downloader.download(
 			self.language_model, 
-			("Please download the HTML file for this web scraping job: " 
-				+ self.job_description
-			),
+			self.job_description,
 			self.context_window
 		)
 		extract_script = extractor.extract(
+            self.language_model,
 			file_location, 
 			self.job_description,
 			self.context_window

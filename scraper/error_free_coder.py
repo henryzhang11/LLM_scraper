@@ -1,4 +1,3 @@
-
 import re
 from typing import Callable
 from subprocess import CompletedProcess
@@ -38,23 +37,22 @@ class ErrorFreeCoder:
             self.generate_and_run_script(self.model, revision_input)
         return self.script
 
-    def generate_and_run_script(self, language_model, input) -> None:
+    def generate_and_run_script(self, language_model, request) -> None:
         """Generate and run a script.
         """
-        code = self.generate_script(language_model, input)
-        print("Generating script.")
+        print("Generating and running script.")
+        code = self.generate_script(language_model,request)
         self.script = code
-        print("Running code.")
         result = self.run_script(code)
         self.stdout = result.stdout
         self.stderr = result.stderr
-        print("Current iteration gives " + code + '.\n')
 
     # TODO: Run code in container instead of directly
     def run_script(self, code : str) -> CompletedProcess:
         """
         Run generated code.
         """
+        print("Running the following code: \"" + code + "\".")
         script_filename = 'script_attempt.py'
         with open(script_filename, 'w') as file:
             file.write(code)
@@ -73,7 +71,7 @@ class ErrorFreeCoder:
         """
         Generate responses until one contains a code block.
         """
-        print(f"Generating language model response with prompt={model_input}")
+        print(f"Generating script.")
         language_model_response = language_model(model_input)
         match = re.search(
             r"```(?:python)?\n(.*?)\n```", 
@@ -85,7 +83,7 @@ class ErrorFreeCoder:
             not match 
             and format_revision_attempt < maximum_refinement_attempts
         ):
-            print("Generating new language model response.")
+            print(f"Generating script another time.")
             language_model_response = language_model(model_input)
             match = re.search(
                 r"```(?:python)?\n(.*?)\n```", 
@@ -94,11 +92,6 @@ class ErrorFreeCoder:
             )
             format_revision_attempt += 1
         if match:
-            print(
-                "Found code snippet in language model response text" + 
-                f" at attempt {format_revision_attempt}"
-            )
-            print("Trying to run the following code:" + match.group(1))
             return match.group(1)
         else:
             raise ValueError("Couldn't generate code block.")

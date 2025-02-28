@@ -1,20 +1,21 @@
 from typing import List, Callable
+import re
 
 def segment_string(string: str, context_window: int) -> List[str]:
     """
-    Segment the string into a list of strings with length < context_window / 2
+    Segment the string into a list of strings with length < context_window // 2
     """
     segments = []
     current_segment_start = 0
     current_segment_end = min(len(string), context_window // 2)
-    segments.append(str[current_segment_start : current_segment_end])
-    while current_segment_end < len(string) - 1:
+    segments.append(string[current_segment_start : current_segment_end])
+    while current_segment_end < len(string):
         current_segment_start = current_segment_end
         current_segment_end = min(
             current_segment_start + context_window // 2, 
-            len(string) - 1
+            len(string)
         )
-        segments.append(str[current_segment_start, current_segment_end])
+        segments.append(string[current_segment_start : current_segment_end])
     return segments
 
 def concatenate_scripts(script_1, script_2) -> str:
@@ -43,14 +44,11 @@ def contains_target(
     """Decides if current segment of HTML contains relevant information.
     """
     request = (
-        "Please answer the following question about a chunk of " + 
-        "downloaded file by briefly analyzing and answering 'Yes' or 'No' " + 
-        "at the end of your answer: Does the chunk contain information " + 
-        "relevant to this web-scraping request: \"" + 
+        "Does \"" +
+      	segment +
+        "\" contain information relevant to the webs-scraping request \"" + 
         user_request + 
-        "\"? Here is the chunk: \"" + 
-        segment + 
-        "\"."
+        "\"? Please analyze if necessary and put \"Yes\" or \"No\" at the end of your answer."
     )
     language_model_output = language_model(request)
     match = re.search(r'\b(Yes|No)\b', language_model_output)
